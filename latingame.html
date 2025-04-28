@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latin Degree Game</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    button { margin: 5px; padding: 10px 20px; font-size: 16px; }
+    .card { max-width: 500px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+    .selected { background-color: #4CAF50; color: white; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Latin Degree Game</h2>
+    <p id="prompt">Identify the following Latin word:</p>
+    <p id="word" style="font-size: 24px; font-weight: bold;"></p>
+
+    <div>
+      <p>Select Degree:</p>
+      <button onclick="selectDegree('positive')" id="positiveBtn">Positive</button>
+      <button onclick="selectDegree('comparative')" id="comparativeBtn">Comparative</button>
+      <button onclick="selectDegree('superlative')" id="superlativeBtn">Superlative</button>
+    </div>
+
+    <div>
+      <p>Is it an Adjective or Adverb?</p>
+      <button onclick="selectType('adjective')" id="adjectiveBtn">Adjective</button>
+      <button onclick="selectType('adverb')" id="adverbBtn">Adverb</button>
+    </div>
+
+    <div>
+      <p>Is it Irregular?</p>
+      <button onclick="selectIrregular(true)" id="irregularYesBtn">Yes</button>
+      <button onclick="selectIrregular(false)" id="irregularNoBtn">No</button>
+    </div>
+
+    <button onclick="checkAnswers()">Check</button>
+    <button onclick="nextWord()" id="nextBtn" style="display:none;">Next</button>
+
+    <p id="feedback"></p>
+    <p id="score">Score: 0 / 0</p>
+  </div>
+
+  <script>
+    const irregularWords = [
+      "bonus", "melior", "optimus",
+      "malus", "peior", "pessimus",
+      "magnus", "maior", "maximus",
+      "parvus", "minor", "minimus",
+      "multi", "plures", "plurimi"
+    ];
+
+    const latinWords = [
+      { word: "longus", degree: "positive", type: "adjective" },
+      { word: "longior", degree: "comparative", type: "adjective" },
+      { word: "longissimus", degree: "superlative", type: "adjective" },
+      { word: "fortiter", degree: "positive", type: "adverb" },
+      { word: "fortius", degree: "comparative", type: "adverb" },
+      { word: "fortissime", degree: "superlative", type: "adverb" },
+      { word: "bonus", degree: "positive", type: "adjective" },
+      { word: "melior", degree: "comparative", type: "adjective" },
+      { word: "optimus", degree: "superlative", type: "adjective" },
+      { word: "alte", degree: "positive", type: "adverb" },
+      { word: "altius", degree: "comparative", type: "adverb" },
+      { word: "altissime", degree: "superlative", type: "adverb" },
+    ];
+
+    let currentWord;
+    let selectedDegree = null;
+    let selectedType = null;
+    let selectedIrregular = null;
+    let score = 0;
+    let total = 0;
+
+    function getRandomWord() {
+      return latinWords[Math.floor(Math.random() * latinWords.length)];
+    }
+
+    function displayWord() {
+      currentWord = getRandomWord();
+      document.getElementById("word").textContent = currentWord.word;
+      resetSelections();
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("nextBtn").style.display = "none";
+    }
+
+    function selectDegree(degree) {
+      selectedDegree = degree;
+      highlightSelected("positiveBtn", degree === "positive");
+      highlightSelected("comparativeBtn", degree === "comparative");
+      highlightSelected("superlativeBtn", degree === "superlative");
+    }
+
+    function selectType(type) {
+      selectedType = type;
+      highlightSelected("adjectiveBtn", type === "adjective");
+      highlightSelected("adverbBtn", type === "adverb");
+    }
+
+    function selectIrregular(value) {
+      selectedIrregular = value;
+      highlightSelected("irregularYesBtn", value === true);
+      highlightSelected("irregularNoBtn", value === false);
+    }
+
+    function highlightSelected(buttonId, selected) {
+      const button = document.getElementById(buttonId);
+      if (selected) {
+        button.classList.add("selected");
+      } else {
+        button.classList.remove("selected");
+      }
+    }
+
+    function checkAnswers() {
+      const isActuallyIrregular = irregularWords.includes(currentWord.word);
+      let correct = true;
+      if (selectedDegree !== currentWord.degree) correct = false;
+      if (selectedType !== currentWord.type) correct = false;
+      if (selectedIrregular !== isActuallyIrregular) correct = false;
+
+      if (correct) {
+        document.getElementById("feedback").textContent = "✅ Correct!";
+        score++;
+      } else {
+        document.getElementById("feedback").textContent = `❌ Incorrect. Degree: ${currentWord.degree}, Type: ${currentWord.type}, Irregular: ${isActuallyIrregular ? "Yes" : "No"}`;
+      }
+      total++;
+      document.getElementById("score").textContent = `Score: ${score} / ${total}`;
+      document.getElementById("nextBtn").style.display = "inline-block";
+    }
+
+    function nextWord() {
+      displayWord();
+    }
+
+    function resetSelections() {
+      selectedDegree = null;
+      selectedType = null;
+      selectedIrregular = null;
+      ["positiveBtn", "comparativeBtn", "superlativeBtn", "adjectiveBtn", "adverbBtn", "irregularYesBtn", "irregularNoBtn"].forEach(id => {
+        document.getElementById(id).classList.remove("selected");
+      });
+    }
+
+    window.onload = displayWord;
+  </script>
+</body>
+</html>
